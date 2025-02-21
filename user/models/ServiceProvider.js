@@ -3,12 +3,25 @@ const mongoose = require('mongoose');
 const serviceProviderSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   },
-  providerName: String,
-  contactInfo: String,
-  address: String,
-  about: String,
+  providerName: {
+    type: String,
+    required: true
+  },
+  contactInfo: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  about: {
+    type: String,
+    required: true
+  },
   ratings: String,
   services: [{
     serviceType: {

@@ -3,19 +3,24 @@ const mongoose = require('mongoose');
 const serviceRequestSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   },
   vehicleId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ServiceVehicle'
+    ref: 'ServiceVehicle',
+    required: true
   },
   serviceTypeId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ServiceType'
+    ref: 'ServiceType',
+    required: true
   },
   status: {
     type: String,
-    enum: ['pending', 'quoted', 'confirmed', 'cancelled']
+    enum: ['pending', 'quoted', 'confirmed', 'cancelled'],
+    required: true,
+    default: 'pending'
   },
   estimates: [{
     providerId: {

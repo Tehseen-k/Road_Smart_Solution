@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const insuranceSchema = new mongoose.Schema({
-  carId: {
+const userCarServiceHistorySchema = new mongoose.Schema({
+  userCarId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'UserCar'
   },
-  insuranceTypeId: {
+  serviceTypeId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ServiceType'
   },
@@ -13,16 +13,14 @@ const insuranceSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ServiceProvider'
   },
-  startDate: Date,
-  endDate: Date,
-  policyNum: {
-    type: Number,
-    unique: true
-  },
+  serviceDate: Date,
+  mileageAtService: Number,
+  cost: Number,
+  description: String,
   documents: [{
     docName: String,
     filePath: String
   }]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Insurance', insuranceSchema); 
+module.exports = mongoose.model('UserCarServiceHistory', userCarServiceHistorySchema); 
