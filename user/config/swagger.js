@@ -14,7 +14,7 @@ const options = {
       },
       servers: [
         {
-          url: 'http://localhost:3000',
+          url: 'https://roadsmartsolution-production.up.railway.app',
           description: 'Development server'
         }
       ],
@@ -29,11 +29,16 @@ const options = {
       }
     },
     apis: [
-      'D:/flutter_projects/RSS_apis/user/routers/user.route.js',
-      'D:/flutter_projects/RSS_apis/user/models/User.js',
-      'D:/flutter_projects/RSS_apis/user/routers/userCar.route.js',
-      'D:/flutter_projects/RSS_apis/user/models/UserCar.js'
+      './user/routers/user.route.js',
+      './user/models/User.js',
+      './user/routers/userCar.route.js',
+      './user/models/UserCar.js',
+      './user/routers/carPart.route.js',
+      './user/models/CarPart.js',
+      './user/routers/carPartOrder.route.js',
+      './user/models/CarPartOrder.js'
     ]
+    
   };
   
 

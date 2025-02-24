@@ -1,3 +1,4 @@
+// models/CarPartOrder.js
 const mongoose = require('mongoose');
 
 const carPartOrderSchema = new mongoose.Schema({
@@ -7,14 +8,22 @@ const carPartOrderSchema = new mongoose.Schema({
   },
   sellerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CarPartsSeller'
+    ref: 'User'
   },
   totalPrice: Number,
   orderDate: Date,
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
-  }
+  },
+  items: [{
+    partId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'CarPart'
+    },
+    quantity: Number,
+    price: Number
+  }]
 }, { timestamps: true });
 
-module.exports = mongoose.model('CarPartOrder', carPartOrderSchema); 
+module.exports = mongoose.model('CarPartOrder', carPartOrderSchema);

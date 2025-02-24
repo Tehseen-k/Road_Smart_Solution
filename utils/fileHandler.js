@@ -1,32 +1,32 @@
-const fs = require('fs').promises;
-const path = require('path');
+const cloudinary = require('../config/cloudinary'); // Import the Cloudinary config
 const ApiError = require('./ApiError');
+const path = require('path');
 
 const fileHandler = {
   async saveFile(file, directory) {
     try {
-      const uploadDir = path.join(__dirname, '../', directory); 
-      const fileName = `${Date.now()}-${file.originalname}`;
-      const filePath = path.join(uploadDir, fileName);
-      const publicPath = path.join(directory, fileName); 
-
-      await fs.mkdir(uploadDir, { recursive: true });
-      await fs.writeFile(filePath, file.buffer);
-      
-      return publicPath; 
+      const uploadResult = await cloudinary.uploader.upload(`data:${file.mimetype};base64,${file.buffer.toString('base64')}`, {
+        folder: directory,
+        resource_type: 'auto',
+      });
+      return uploadResult.secure_url;
     } catch (error) {
-      throw new ApiError(500, 'Error saving file');
+      console.error('Error uploading file to Cloudinary:', {
+        message: error.message,
+        stack: error.stack,
+        details: error.response ? error.response.data : null,
+      });
+      throw new ApiError(500, 'Error uploading file to Cloudinary');
     }
   },
 
-  async deleteFile(filePath) {
+  async deleteFile(fileUrl) {
     try {
-      const absolutePath = path.join(__dirname, '../', filePath);
-      await fs.unlink(absolutePath);
+      // Extract the public ID from the Cloudinary URL
+      const publicId = fileUrl.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(publicId);
     } catch (error) {
-      if (error.code !== 'ENOENT') { 
-        throw new ApiError(500, 'Error deleting file');
-      }
+      throw new ApiError(500, 'Error deleting file from Cloudinary');
     }
   },
 
@@ -38,10 +38,6 @@ const fileHandler = {
     const extension = this.getFileExtension(file.originalname);
     return allowedTypes.includes(extension);
   },
-
-  async getFullPath(relativePath) {
-    return path.join(__dirname, '../', relativePath);
-  }
 };
 
 module.exports = fileHandler;

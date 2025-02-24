@@ -1,25 +1,23 @@
-const CarPartOrder = require('../models/CarPartOrder');
+
 const CarPart = require('../models/CarPart');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const CarPartOrder = require('../models/CarPartOrder');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const carPartOrderController = {
-  // Create new order
   createOrder: catchAsync(async (req, res) => {
     if (!validationHelper.isValidId(req.body.userId)) {
       throw new ApiError(400, 'Invalid user ID');
     }
 
-    // Validate order items
     if (!req.body.items || !Array.isArray(req.body.items) || req.body.items.length === 0) {
       throw new ApiError(400, 'Order must contain at least one item');
     }
 
-    // Validate and process each item
     const orderItems = await Promise.all(req.body.items.map(async item => {
       if (!validationHelper.isValidId(item.partId)) {
         throw new ApiError(400, 'Invalid part ID in order items');
@@ -42,7 +40,6 @@ const carPartOrderController = {
       };
     }));
 
-    // Calculate total amount
     const totalAmount = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
 
     const order = new CarPartOrder({
@@ -53,7 +50,6 @@ const carPartOrderController = {
       status: 'pending'
     });
 
-    // Handle shipping documents
     if (req.files && req.files.length > 0) {
       const documents = await Promise.all(req.files.map(async file => {
         if (!fileHandler.isValidFileType(file, ['.pdf', '.jpg', '.jpeg', '.png'])) {
@@ -66,7 +62,6 @@ const carPartOrderController = {
 
     await order.save();
 
-    // Update stock quantities
     await Promise.all(orderItems.map(item =>
       CarPart.findByIdAndUpdate(item.partId, {
         $inc: { stockQuantity: -item.quantity }
@@ -81,14 +76,12 @@ const carPartOrderController = {
     return response.created(populatedOrder, 'Order created successfully');
   }),
 
-  // Get all orders
   getAllOrders: catchAsync(async (req, res) => {
     const { page, limit, skip } = paginationHelper.getPaginationParams(req);
     const query = validationHelper.sanitizeQuery(req.query);
     delete query.page;
     delete query.limit;
 
-    // Date range filter
     if (query.startDate && query.endDate) {
       query.createdAt = {
         $gte: new Date(query.startDate),
@@ -98,7 +91,6 @@ const carPartOrderController = {
       delete query.endDate;
     }
 
-    // Amount range filter
     if (query.minAmount || query.maxAmount) {
       query.totalAmount = {};
       if (query.minAmount) query.totalAmount.$gte = parseFloat(query.minAmount);
@@ -123,7 +115,6 @@ const carPartOrderController = {
     });
   }),
 
-  // Get order by ID
   getOrderById: catchAsync(async (req, res) => {
     if (!validationHelper.isValidId(req.params.id)) {
       throw new ApiError(400, 'Invalid order ID');
@@ -141,7 +132,6 @@ const carPartOrderController = {
     return response.success(order);
   }),
 
-  // Update order status
   updateOrderStatus: catchAsync(async (req, res) => {
     if (!validationHelper.isValidId(req.params.id)) {
       throw new ApiError(400, 'Invalid order ID');
@@ -159,7 +149,6 @@ const carPartOrderController = {
       throw new ApiError(404, 'Order not found');
     }
 
-    // Handle status-specific logic
     if (status === 'cancelled' && order.status === 'shipped') {
       throw new ApiError(400, 'Cannot cancel shipped order');
     }
@@ -168,7 +157,6 @@ const carPartOrderController = {
       throw new ApiError(400, 'Tracking number required for shipped status');
     }
 
-    // Restore stock if order is cancelled
     if (status === 'cancelled' && order.status !== 'cancelled') {
       await Promise.all(order.items.map(item =>
         CarPart.findByIdAndUpdate(item.partId, {
@@ -193,7 +181,6 @@ const carPartOrderController = {
     return response.success(updatedOrder, 'Order status updated successfully');
   }),
 
-  // Get user's order history
   getUserOrders: catchAsync(async (req, res) => {
     const { userId } = req.params;
     if (!validationHelper.isValidId(userId)) {
@@ -217,7 +204,6 @@ const carPartOrderController = {
     });
   }),
 
-  // Get order statistics
   getOrderStats: catchAsync(async (req, res) => {
     const stats = await CarPartOrder.aggregate([
       {
@@ -282,4 +268,4 @@ const carPartOrderController = {
   })
 };
 
-module.exports = carPartOrderController; 
+module.exports = carPartOrderController;

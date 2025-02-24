@@ -1,14 +1,13 @@
 const CarPart = require('../models/CarPart');
 const CarPartOrder = require('../models/CarPartOrder');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const carPartController = {
-  // Create new car part
   createCarPart: catchAsync(async (req, res) => {
     if (!validationHelper.isValidId(req.body.sellerId)) {
       throw new ApiError(400, 'Invalid seller ID');
@@ -16,7 +15,6 @@ const carPartController = {
 
     const carPart = new CarPart(req.body);
 
-    // Handle part images
     if (req.files && req.files.length > 0) {
       const images = await Promise.all(req.files.map(async file => {
         if (!fileHandler.isValidFileType(file, ['.jpg', '.jpeg', '.png'])) {
@@ -27,7 +25,6 @@ const carPartController = {
       carPart.images = images;
     }
 
-    // Handle technical specifications document
     if (req.body.specifications) {
       try {
         carPart.specifications = JSON.parse(req.body.specifications);
@@ -42,14 +39,12 @@ const carPartController = {
     return response.created(carPart, 'Car part created successfully');
   }),
 
-  // Get all car parts with filters
   getAllParts: catchAsync(async (req, res) => {
     const { page, limit, skip } = paginationHelper.getPaginationParams(req);
     const query = validationHelper.sanitizeQuery(req.query);
     delete query.page;
     delete query.limit;
 
-    // Price range filter
     if (query.minPrice || query.maxPrice) {
       query.price = {};
       if (query.minPrice) query.price.$gte = parseFloat(query.minPrice);
@@ -58,7 +53,6 @@ const carPartController = {
       delete query.maxPrice;
     }
 
-    // Compatibility filter
     if (query.make || query.model || query.year) {
       const compatibilityRegex = new RegExp(
         `${query.make || ''}.*${query.model || ''}.*${query.year || ''}`, 'i'
@@ -84,7 +78,6 @@ const carPartController = {
     });
   }),
 
-  // Get part by ID
   getPartById: catchAsync(async (req, res) => {
     if (!validationHelper.isValidId(req.params.id)) {
       throw new ApiError(400, 'Invalid part ID');
@@ -97,7 +90,6 @@ const carPartController = {
       throw new ApiError(404, 'Car part not found');
     }
 
-    // Get related parts
     const relatedParts = await CarPart.find({
       category: part.category,
       _id: { $ne: part._id }
@@ -112,7 +104,6 @@ const carPartController = {
     });
   }),
 
-  // Update part
   updatePart: catchAsync(async (req, res) => {
     if (!validationHelper.isValidId(req.params.id)) {
       throw new ApiError(400, 'Invalid part ID');
@@ -123,16 +114,13 @@ const carPartController = {
       throw new ApiError(404, 'Car part not found');
     }
 
-    // Handle image updates
     if (req.files && req.files.length > 0) {
-      // Delete existing images
       if (part.images && part.images.length > 0) {
         await Promise.all(part.images.map(image => 
           fileHandler.deleteFile(image)
         ));
       }
 
-      // Upload new images
       const images = await Promise.all(req.files.map(async file => {
         if (!fileHandler.isValidFileType(file, ['.jpg', '.jpeg', '.png'])) {
           throw new ApiError(400, 'Invalid file type. Only images are allowed');
@@ -142,7 +130,6 @@ const carPartController = {
       req.body.images = images;
     }
 
-    // Handle specifications update
     if (req.body.specifications) {
       try {
         req.body.specifications = JSON.parse(req.body.specifications);
@@ -161,7 +148,6 @@ const carPartController = {
     return response.success(updatedPart, 'Car part updated successfully');
   }),
 
-  // Delete part
   deletePart: catchAsync(async (req, res) => {
     if (!validationHelper.isValidId(req.params.id)) {
       throw new ApiError(400, 'Invalid part ID');
@@ -172,7 +158,6 @@ const carPartController = {
       throw new ApiError(404, 'Car part not found');
     }
 
-    // Check for pending orders
     const pendingOrders = await CarPartOrder.findOne({
       'items.partId': part._id,
       status: { $in: ['pending', 'confirmed'] }
@@ -182,7 +167,6 @@ const carPartController = {
       throw new ApiError(400, 'Cannot delete part with pending orders');
     }
 
-    // Delete associated images
     if (part.images && part.images.length > 0) {
       await Promise.all(part.images.map(image => 
         fileHandler.deleteFile(image)
@@ -195,7 +179,6 @@ const carPartController = {
     return response.noContent();
   }),
 
-  // Search parts
   searchParts: catchAsync(async (req, res) => {
     const { query } = req.query;
     const { page, limit, skip } = paginationHelper.getPaginationParams(req);
@@ -225,7 +208,6 @@ const carPartController = {
     });
   }),
 
-  // Get parts by category
   getPartsByCategory: catchAsync(async (req, res) => {
     const { category } = req.params;
     const { page, limit, skip } = paginationHelper.getPaginationParams(req);
@@ -245,7 +227,6 @@ const carPartController = {
     });
   }),
 
-  // Get part statistics
   getPartStats: catchAsync(async (req, res) => {
     const stats = await CarPart.aggregate([
       {
@@ -278,4 +259,4 @@ const carPartController = {
   })
 };
 
-module.exports = carPartController; 
+module.exports = carPartController;

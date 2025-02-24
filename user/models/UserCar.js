@@ -51,4 +51,7 @@ const userCarSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
+userCarSchema.set('toJSON', { virtuals: true });
+userCarSchema.set('toObject', { virtuals: true });
+
 module.exports = mongoose.model('UserCar', userCarSchema); 

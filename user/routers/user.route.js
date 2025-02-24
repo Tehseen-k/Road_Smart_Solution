@@ -37,7 +37,7 @@ const userController = require('../controllers/userController');
 
 /**
  * @swagger
- * /register/email:
+ * /user/register/email:
  *   post:
  *     tags: [Authentication]
  *     summary: Register new user with email
@@ -80,7 +80,7 @@ router.post('/register/email', userController.createUser);
 
 /**
  * @swagger
- * /login/email:
+ * /user/login/email:
  *   post:
  *     tags: [Authentication]
  *     summary: Login with email
@@ -110,7 +110,7 @@ router.post('/login/email', userController.loginWithEmail);
 
 /**
  * @swagger
- * /login/phone/send-otp:
+ * /user/login/phone/send-otp:
  *   post:
  *     tags: [Authentication]
  *     summary: Send OTP for phone login
@@ -134,7 +134,7 @@ router.post('/login/phone/send-otp', userController.sendPhoneOTP);
 
 /**
  * @swagger
- * /login/phone/verify:
+ * /user/login/phone/verify:
  *   post:
  *     tags: [Authentication]
  *     summary: Verify phone OTP
@@ -162,7 +162,7 @@ router.post('/login/phone/verify', userController.verifyPhoneOTP);
 
 /**
  * @swagger
- * /login/google:
+ * /user/login/google:
  *   post:
  *     tags: [Authentication]
  *     summary: Login with Google
@@ -185,7 +185,7 @@ router.post('/login/google', userController.googleSignIn);
 
 /**
  * @swagger
- * /verify-email/{token}:
+ * /user/verify-email/{token}:
  *   get:
  *     tags: [Email Verification]
  *     summary: Verify email address
@@ -205,7 +205,7 @@ router.get('/verify-email/:token', userController.verifyEmail);
 
 /**
  * @swagger
- * /forgot-password:
+ * /user/forgot-password:
  *   post:
  *     tags: [Password Management]
  *     summary: Request password reset
@@ -229,7 +229,7 @@ router.post('/forgot-password', userController.forgotPassword);
 
 /**
  * @swagger
- * /users:
+ * /user/users:
  *   get:
  *     tags: [User Management]
  *     summary: Get all users
@@ -261,7 +261,7 @@ router.get('/users', userController.getAllUsers);
 
 /**
  * @swagger
- * /users/{id}:
+ * /user/users/{id}:
  *   get:
  *     tags: [User Management]
  *     summary: Get user by ID
@@ -302,7 +302,7 @@ router.delete('/users/:id', userController.deleteUser);
 
 /**
  * @swagger
- * /by-role/{role}:
+ * /user/by-role/{role}:
  *   get:
  *     tags: [User Management]
  *     summary: Get users by role

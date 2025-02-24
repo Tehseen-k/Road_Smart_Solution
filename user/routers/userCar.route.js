@@ -6,6 +6,11 @@ const upload = require('../../utils/upload');
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     UserCar:
  *       type: object
@@ -19,58 +24,90 @@ const upload = require('../../utils/upload');
  *       properties:
  *         userId:
  *           type: string
- *           description: Reference to the user who owns the car
+ *           description: Valid MongoDB ObjectId of the user
+ *           example: 60d5ec9af8b7a61234567890
  *         carName:
  *           type: string
+ *           example: "My Daily Driver"
  *         carMake:
  *           type: string
+ *           example: "Toyota"
  *         carModel:
  *           type: string
+ *           example: "Camry"
  *         carYear:
- *           type: number
+ *           type: integer
+ *           example: 2020
  *         trim:
  *           type: string
+ *           example: "LE"
  *         engine:
  *           type: string
+ *           example: "2.5L 4-cylinder"
  *         cylinders:
- *           type: number
+ *           type: integer
+ *           example: 4
  *         fuelType:
  *           type: string
  *           enum: [petrol, diesel, electric]
+ *           example: petrol
  *         driveType:
  *           type: string
  *           enum: [AWD, FWD, RWD]
+ *           example: FWD
  *         bodyType:
  *           type: string
  *           enum: [sedan, suv, hatchback, etc]
+ *           example: sedan
  *         estimatedValue:
  *           type: number
+ *           example: 25000
  *         odometer:
  *           type: number
+ *           example: 15000
  *         vin:
  *           type: string
- *           unique: true
+ *           description: Unique vehicle identification number
+ *           example: "1HGBH41JXMN109186"
  *         registrationNum:
  *           type: string
- *           maxLength: 50
+ *           example: "ABC123"
  *         country:
  *           type: string
+ *           example: "USA"
  *         documents:
  *           type: array
  *           items:
- *             type: object
- *             properties:
- *               docName:
- *                 type: string
- *               filePath:
- *                 type: string
+ *             $ref: '#/components/schemas/CarDocument'
+ *     CarDocument:
+ *       type: object
+ *       properties:
+ *         docName:
+ *           type: string
+ *           example: "insurance.pdf"
+ *         filePath:
+ *           type: string
+ *           example: "uploads/car-documents/insurance.pdf"
+ *     PaginationMeta:
+ *       type: object
+ *       properties:
+ *         totalItems:
+ *           type: integer
+ *         itemCount:
+ *           type: integer
+ *         itemsPerPage:
+ *           type: integer
+ *         totalPages:
+ *           type: integer
+ *         currentPage:
+ *           type: integer
  */
 
 /**
  * @swagger
- * /cars:
+ * /user-car/cars:
  *   post:
- *     summary: Create a new car for a user
+ *     summary: Create a new car with optional documents
  *     tags: [Cars]
  *     security:
  *       - bearerAuth: []
@@ -84,33 +121,91 @@ const upload = require('../../utils/upload');
  *               - userId
  *               - carMake
  *               - carModel
+ *               - fuelType
+ *               - driveType
+ *               - bodyType
  *             properties:
  *               userId:
  *                 type: string
+ *                 example: 60d5ec9af8b7a61234567890
+ *               carName:
+ *                 type: string
+ *                 example: "My Daily Driver"
  *               carMake:
  *                 type: string
+ *                 example: "Toyota"
  *               carModel:
  *                 type: string
+ *                 example: "Camry"
+ *               carYear:
+ *                 type: integer
+ *                 example: 2020
+ *               trim:
+ *                 type: string
+ *                 example: "LE"
+ *               engine:
+ *                 type: string
+ *                 example: "2.5L 4-cylinder"
+ *               cylinders:
+ *                 type: integer
+ *                 example: 4
+ *               fuelType:
+ *                 type: string
+ *                 enum: [petrol, diesel, electric]
+ *                 example: petrol
+ *               driveType:
+ *                 type: string
+ *                 enum: [AWD, FWD, RWD]
+ *                 example: FWD
+ *               bodyType:
+ *                 type: string
+ *                 enum: [sedan, suv, hatchback, etc]
+ *                 example: sedan
+ *               estimatedValue:
+ *                 type: number
+ *                 example: 25000
+ *               odometer:
+ *                 type: number
+ *                 example: 15000
+ *               vin:
+ *                 type: string
+ *                 example: "1HGBH41JXMN109186"
+ *               registrationNum:
+ *                 type: string
+ *                 example: "ABC123"
+ *               country:
+ *                 type: string
+ *                 example: "USA"
  *               documents:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
+ *                   description: Supported file types - PDF, JPG, JPEG, PNG
  *     responses:
  *       201:
- *         description: Car created successfully
+ *         description: Car created successfully with documents
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/UserCar'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/UserCar'
+ *                 message:
+ *                   type: string
+ *                   example: "Car created successfully"
  */
 router.post('/cars', upload.array('documents'), userCarController.createUserCar);
 
 /**
  * @swagger
- * /users/{userId}/cars:
+ * /user-car/users/{userId}/cars:
  *   get:
- *     summary: Get all cars for a specific user
+ *     summary: Get paginated cars for user
  *     tags: [Cars]
  *     security:
  *       - bearerAuth: []
@@ -124,13 +219,15 @@ router.post('/cars', upload.array('documents'), userCarController.createUserCar)
  *         name: page
  *         schema:
  *           type: integer
+ *           default: 1
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
+ *           default: 10
  *     responses:
  *       200:
- *         description: List of user's cars
+ *         description: Paginated car results
  *         content:
  *           application/json:
  *             schema:
@@ -140,14 +237,16 @@ router.post('/cars', upload.array('documents'), userCarController.createUserCar)
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/UserCar'
+ *                 meta:
+ *                   $ref: '#/components/schemas/PaginationMeta'
  */
 router.get('/users/:userId/cars', userCarController.getUserCars);
 
 /**
  * @swagger
- * /cars/{id}:
+ * /user-car/cars/{id}:
  *   get:
- *     summary: Get car by ID
+ *     summary: Get car details by ID
  *     tags: [Cars]
  *     security:
  *       - bearerAuth: []
@@ -179,22 +278,16 @@ router.get('/users/:userId/cars', userCarController.getUserCars);
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             properties:
- *               carMake:
- *                 type: string
- *               carModel:
- *                 type: string
- *               documents:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
+ *             $ref: '#/components/schemas/UserCar'
  *     responses:
  *       200:
- *         description: Car updated successfully
+ *         description: Updated car details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserCar'
  *   delete:
- *     summary: Delete car
+ *     summary: Delete a car
  *     tags: [Cars]
  *     security:
  *       - bearerAuth: []
@@ -214,9 +307,9 @@ router.delete('/cars/:id', userCarController.deleteCar);
 
 /**
  * @swagger
- * /cars/{carId}/documents:
+ * /user-car/cars/{carId}/documents:
  *   post:
- *     summary: Add document to car
+ *     summary: Upload document for car
  *     tags: [Car Documents]
  *     security:
  *       - bearerAuth: []
@@ -227,25 +320,28 @@ router.delete('/cars/:id', userCarController.deleteCar);
  *         schema:
  *           type: string
  *     requestBody:
+ *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
- *             required:
- *               - document
  *             properties:
  *               document:
  *                 type: string
  *                 format: binary
  *     responses:
  *       201:
- *         description: Document added successfully
+ *         description: Document uploaded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CarDocument'
  */
 router.post('/cars/:carId/documents', upload.single('document'), userCarController.addCarDocument);
 
 /**
  * @swagger
- * /documents/{docId}:
+ * /user-car/documents/{docId}:
  *   delete:
  *     summary: Delete car document
  *     tags: [Car Documents]
@@ -259,24 +355,24 @@ router.post('/cars/:carId/documents', upload.single('document'), userCarControll
  *           type: string
  *     responses:
  *       204:
- *         description: Document deleted successfully
+ *         description: Document deleted
  */
 router.delete('/documents/:docId', userCarController.deleteCarDocument);
 
 /**
  * @swagger
- * /cars/search:
+ * /user-car/cars/search:
  *   get:
- *     summary: Search cars
+ *     summary: Search cars by multiple fields
  *     tags: [Cars]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: query
+ *         required: true
  *         schema:
  *           type: string
- *         description: Search term for car name, make, model, VIN, or registration number
  *     responses:
  *       200:
  *         description: Search results
