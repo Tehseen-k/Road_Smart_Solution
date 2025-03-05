@@ -1,11 +1,11 @@
 const Insurance = require('../models/Insurance');
 const InsuranceClaim = require('../models/InsuranceClaim');
 const InsuranceDoc = require('../models/InsuranceDoc');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const fileHandler = require('../utils/fileHandler');
-const paginationHelper = require('../utils/paginationHelper');
-const validationHelper = require('../utils/validationHelper');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const fileHandler = require('../../utils/fileHandler');
+const paginationHelper = require('../../utils/paginationHelper');
+const validationHelper = require('../../utils/validationHelper');
 
 const insuranceController = {
   // Create new insurance

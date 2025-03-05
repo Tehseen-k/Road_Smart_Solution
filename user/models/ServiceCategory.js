@@ -7,6 +7,10 @@ const serviceCategorySchema = new mongoose.Schema({
     unique: true
   },
   description: String,
+  displayOrder: {
+    type: Number,
+    default: 0
+  },
   isActive: {
     type: Boolean,
     default: true

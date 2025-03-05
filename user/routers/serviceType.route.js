@@ -4,42 +4,68 @@ const serviceTypeController = require('../controllers/serviceTypeController');
 
 /**
  * @swagger
- * /service-types:
+ * tags:
+ *   name: Service Types
+ *   description: API endpoints for managing service types
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     ServiceType:
+ *       type: object
+ *       required:
+ *         - subcategoryId
+ *         - serviceName
+ *         - description
+ *       properties:
+ *         subcategoryId:
+ *           type: string
+ *           description: Reference ID to the service subcategory
+ *         serviceName:
+ *           type: string
+ *           description: Name of the service type
+ *         description:
+ *           type: string
+ *           description: Description of the service type
+ *     ServiceTypeResponse:
+ *       allOf:
+ *         - $ref: '#/components/schemas/ServiceType'
+ *         - type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               description: The auto-generated id of the service type
+ *             createdAt:
+ *               type: string
+ *               format: date-time
+ *             updatedAt:
+ *               type: string
+ *               format: date-time
+ */
+
+/**
+ * @swagger
+ * /user/service-types:
  *   post:
+ *     tags: [Service Types]
  *     summary: Create a new service type
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               subcategoryId:
- *                 type: string
- *               standardPrice:
- *                 type: number
- *               estimatedTime:
- *                 type: string
- *               requirements:
- *                 type: array
- *                 items:
- *                   type: string
- *               materials:
- *                 type: array
- *                 items:
- *                   type: string
- *               image:
- *                 type: string
- *                 format: binary
+ *             $ref: '#/components/schemas/ServiceType'
  *     responses:
  *       201:
  *         description: Service type created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ServiceTypeResponse'
  *       400:
- *         description: Invalid subcategory ID or file type
+ *         description: Invalid request data
  *       404:
  *         description: Subcategory not found
  */
@@ -47,26 +73,45 @@ router.post('/service-types', serviceTypeController.createServiceType);
 
 /**
  * @swagger
- * /service-types:
+ * /user/service-types:
  *   get:
+ *     tags: [Service Types]
  *     summary: Get all service types
  *     parameters:
- *       - in: query
- *         name: priceRange
- *         description: Price range filter in format "min-max"
- *         schema:
- *           type: string
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           default: 1
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
  *     responses:
  *       200:
  *         description: List of service types
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ServiceTypeResponse'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
  *       400:
  *         description: Invalid query parameters
  */
@@ -74,8 +119,9 @@ router.get('/service-types', serviceTypeController.getAllServiceTypes);
 
 /**
  * @swagger
- * /service-types/{id}:
+ * /user/service-types/{id}:
  *   get:
+ *     tags: [Service Types]
  *     summary: Get a service type by ID
  *     parameters:
  *       - in: path
@@ -87,6 +133,10 @@ router.get('/service-types', serviceTypeController.getAllServiceTypes);
  *     responses:
  *       200:
  *         description: Service type found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ServiceTypeResponse'
  *       400:
  *         description: Invalid service type ID
  *       404:
@@ -96,8 +146,9 @@ router.get('/service-types/:id', serviceTypeController.getServiceTypeById);
 
 /**
  * @swagger
- * /service-types/{id}:
+ * /user/service-types/{id}:
  *   put:
+ *     tags: [Service Types]
  *     summary: Update a service type
  *     parameters:
  *       - in: path
@@ -111,32 +162,16 @@ router.get('/service-types/:id', serviceTypeController.getServiceTypeById);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               standardPrice:
- *                 type: number
- *               estimatedTime:
- *                 type: string
- *               requirements:
- *                 type: array
- *                 items:
- *                   type: string
- *               materials:
- *                 type: array
- *                 items:
- *                   type: string
- *               image:
- *                 type: string
- *                 format: binary
+ *             $ref: '#/components/schemas/ServiceType'
  *     responses:
  *       200:
  *         description: Service type updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ServiceTypeResponse'
  *       400:
- *         description: Invalid file type or service type not found
+ *         description: Invalid request data
  *       404:
  *         description: Service type not found
  */
@@ -144,8 +179,9 @@ router.put('/service-types/:id', serviceTypeController.updateServiceType);
 
 /**
  * @swagger
- * /service-types/{id}:
+ * /user/service-types/{id}:
  *   delete:
+ *     tags: [Service Types]
  *     summary: Delete a service type
  *     parameters:
  *       - in: path
@@ -158,7 +194,7 @@ router.put('/service-types/:id', serviceTypeController.updateServiceType);
  *       204:
  *         description: Service type deleted successfully
  *       400:
- *         description: Invalid service type ID or active requests
+ *         description: Invalid service type ID
  *       404:
  *         description: Service type not found
  */
@@ -166,8 +202,9 @@ router.delete('/service-types/:id', serviceTypeController.deleteServiceType);
 
 /**
  * @swagger
- * /service-types/subcategory/{subcategoryId}:
+ * /user/service-types/subcategory/{subcategoryId}:
  *   get:
+ *     tags: [Service Types]
  *     summary: Get all service types by subcategory ID
  *     parameters:
  *       - in: path
@@ -180,13 +217,36 @@ router.delete('/service-types/:id', serviceTypeController.deleteServiceType);
  *         name: page
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           default: 1
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
  *     responses:
  *       200:
  *         description: List of service types for a specific subcategory
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ServiceTypeResponse'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
  *       400:
  *         description: Invalid subcategory ID
  */
@@ -194,8 +254,9 @@ router.get('/service-types/subcategory/:subcategoryId', serviceTypeController.ge
 
 /**
  * @swagger
- * /service-types/search:
+ * /user/service-types/search:
  *   get:
+ *     tags: [Service Types]
  *     summary: Search for service types
  *     parameters:
  *       - in: query
@@ -208,13 +269,36 @@ router.get('/service-types/subcategory/:subcategoryId', serviceTypeController.ge
  *         name: page
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           default: 1
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
  *     responses:
  *       200:
  *         description: List of matching service types
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ServiceTypeResponse'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
  *       400:
  *         description: Invalid query parameter
  */
@@ -222,12 +306,22 @@ router.get('/service-types/search', serviceTypeController.searchServiceTypes);
 
 /**
  * @swagger
- * /service-types/stats:
+ * /user/service-types/stats:
  *   get:
+ *     tags: [Service Types]
  *     summary: Get service type statistics
  *     responses:
  *       200:
  *         description: Service type statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalServiceTypes:
+ *                   type: integer
+ *                 activeServiceTypes:
+ *                   type: integer
  */
 router.get('/service-types/stats', serviceTypeController.getServiceTypeStats);
 

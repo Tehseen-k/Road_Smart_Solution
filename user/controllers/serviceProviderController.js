@@ -1,12 +1,12 @@
 const ServiceProvider = require('../models/ServiceProvider');
 const ProviderService = require('../models/ProviderService');
 const ServiceType = require('../models/ServiceType');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const serviceProviderController = {
   // Create service provider
@@ -26,7 +26,7 @@ const serviceProviderController = {
     // Handle services if provided
     if (req.body.services && Array.isArray(req.body.services)) {
       const validServices = req.body.services.every(service => 
-        validationHelper.isValidId(service.serviceTypeId)
+        validationHelper.isValidId(service.serviceType)
       );
 
       if (!validServices) {
@@ -136,7 +136,7 @@ const serviceProviderController = {
     // Update services if provided
     if (req.body.services && Array.isArray(req.body.services)) {
       const validServices = req.body.services.every(service => 
-        validationHelper.isValidId(service.serviceTypeId)
+        validationHelper.isValidId(service.serviceType)
       );
 
       if (!validServices) {
@@ -180,7 +180,7 @@ const serviceProviderController = {
 
     // Delete associated services
     await ProviderService.deleteMany({ providerId: provider._id });
-    await provider.remove();
+    await ServiceProvider.deleteOne({ _id: provider._id });
 
     const response = new ResponseHandler(res);
     return response.noContent();
@@ -189,7 +189,7 @@ const serviceProviderController = {
   // Add service to provider
   addService: catchAsync(async (req, res) => {
     const { providerId } = req.params;
-    const { serviceTypeId, price } = req.body;
+    const { serviceType, price } = req.body;
 
     // Check if provider exists
     const provider = await ServiceProvider.findById(providerId);
@@ -198,15 +198,15 @@ const serviceProviderController = {
     }
 
     // Check if service type exists
-    const serviceType = await ServiceType.findById(serviceTypeId);
-    if (!serviceType) {
+    const serviceTypee = await ServiceType.findById(serviceType);
+    if (!serviceTypee) {
       throw new ApiError(404, 'Service type not found');
     }
 
     // Check if service already exists
     const existingService = await ProviderService.findOne({
       providerId,
-      serviceTypeId
+      serviceType
     });
 
     if (existingService) {
@@ -215,7 +215,7 @@ const serviceProviderController = {
 
     const providerService = new ProviderService({
       providerId,
-      serviceTypeId,
+      serviceType,
       price
     });
 

@@ -160,28 +160,28 @@ router.post('/login/phone/send-otp', userController.sendPhoneOTP);
  */
 router.post('/login/phone/verify', userController.verifyPhoneOTP);
 
-/**
- * @swagger
- * /user/login/google:
- *   post:
- *     tags: [Authentication]
- *     summary: Login with Google
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - idToken
- *             properties:
- *               idToken:
- *                 type: string
- *     responses:
- *       200:
- *         description: Login successful
- */
-router.post('/login/google', userController.googleSignIn);
+// /**
+//  * @swagger
+//  * /user/login/google:
+//  *   post:
+//  *     tags: [Authentication]
+//  *     summary: Login with Google
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             required:
+//  *               - idToken
+//  *             properties:
+//  *               idToken:
+//  *                 type: string
+//  *     responses:
+//  *       200:
+//  *         description: Login successful
+//  */
+// router.post('/login/google', userController.googleSignIn);
 
 /**
  * @swagger
@@ -324,5 +324,141 @@ router.delete('/users/:id', userController.deleteUser);
  *                 $ref: '#/components/schemas/User'
  */
 router.get('/by-role/:role', userController.getUsersByRole);
+
+/**
+ * @swagger
+ * /user/send-verification:
+ *   post:
+ *     tags: [Email Verification]
+ *     summary: Send verification email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Verification email sent successfully
+ *       404:
+ *         description: User not found
+ */
+router.post('/send-verification', userController.sendVerificationEmail);
+
+/**
+ * @swagger
+ * /user/reset-password/{token}:
+ *   post:
+ *     tags: [Password Management]
+ *     summary: Reset password using token
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *       400:
+ *         description: Invalid or expired token
+ */
+router.post('/reset-password/:token', userController.resetPassword);
+
+// /**
+//  * @swagger
+//  * /user/login/facebook:
+//  *   post:
+//  *     tags: [Authentication]
+//  *     summary: Login with Facebook
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             required:
+//  *               - accessToken
+//  *             properties:
+//  *               accessToken:
+//  *                 type: string
+//  *     responses:
+//  *       200:
+//  *         description: Login successful
+//  */
+// router.post('/login/facebook', userController.facebookSignIn);
+
+// /**
+//  * @swagger
+//  * /user/login/apple:
+//  *   post:
+//  *     tags: [Authentication]
+//  *     summary: Login with Apple
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             required:
+//  *               - idToken
+//  *               - user
+//  *             properties:
+//  *               idToken:
+//  *                 type: string
+//  *               user:
+//  *                 type: object
+//  *     responses:
+//  *       200:
+//  *         description: Login successful
+//  */
+// router.post('/login/apple', userController.appleSignIn);
+
+/**
+ * @swagger
+ * /user/complete-phone-registration:
+ *   post:
+ *     tags: [Authentication]
+ *     summary: Complete registration for phone users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phone
+ *               - username
+ *             properties:
+ *               phone:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Registration completed successfully
+ */
+router.post('/complete-phone-registration', userController.completePhoneRegistration);
 
 module.exports = router;

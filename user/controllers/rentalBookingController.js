@@ -1,11 +1,11 @@
 const RentalBooking = require('../models/RentalBooking');
 const RentalCar = require('../models/RentalCar');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const rentalBookingController = {
   // Create new booking

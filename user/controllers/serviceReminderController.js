@@ -1,10 +1,10 @@
 const ServiceReminder = require('../models/ServiceReminder');
 const UserCar = require('../models/UserCar');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
 
 const serviceReminderController = {
   createReminder: catchAsync(async (req, res) => {

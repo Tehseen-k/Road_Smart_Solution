@@ -1,10 +1,10 @@
-const VehicleSpecialProduct = require('../models/VehicleSpecialProduct');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const VehicleSpecialProduct = require('../models/VehicleSpecificProduct');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const vehicleSpecialProductController = {
   createProduct: catchAsync(async (req, res) => {

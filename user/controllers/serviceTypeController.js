@@ -1,12 +1,12 @@
 const ServiceType = require('../models/ServiceType');
 const ServiceSubcategory = require('../models/ServiceSubcategory');
 const ServiceRequest = require('../models/ServiceRequest');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const serviceTypeController = {
   // Create new service type

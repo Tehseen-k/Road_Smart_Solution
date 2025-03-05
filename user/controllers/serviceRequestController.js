@@ -1,12 +1,12 @@
 const ServiceRequest = require('../models/ServiceRequest');
 const ServiceProvider = require('../models/ServiceProvider');
 const ServiceQuote = require('../models/ServiceQuote');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const serviceRequestController = {
   // Create new service request

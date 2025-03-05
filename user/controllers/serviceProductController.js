@@ -1,10 +1,10 @@
 const ServiceProduct = require('../models/ServiceProduct');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const serviceProductController = {
   createProduct: catchAsync(async (req, res) => {
@@ -19,18 +19,9 @@ const serviceProductController = {
 
     const product = new ServiceProduct({
       name: req.body.name,
-      description: req.body.description,
       brand: req.body.brand,
-      category: req.body.category,
-      price: req.body.price,
-      unit: req.body.unit,
-      stockQuantity: req.body.stockQuantity,
-      minStockLevel: req.body.minStockLevel,
-      specifications: req.body.specifications || {},
-      usage: req.body.usage || [],
-      safetyInfo: req.body.safetyInfo || [],
-      warrantyInfo: req.body.warrantyInfo,
-      status: 'active'
+      createdBy: req.body.userId,
+      vehicleSpecificProducts: req.body.vehicleSpecificProducts || []
     });
 
     if (req.files && req.files.length > 0) {
@@ -48,23 +39,18 @@ const serviceProductController = {
 
   getAllProducts: catchAsync(async (req, res) => {
     const { page, limit, skip } = paginationHelper.getPaginationParams(req);
-    const { category, brand, inStock, status, sortBy } = req.query;
+    const { brand } = req.query;
 
     const query = {};
-    if (category) query.category = category;
     if (brand) query.brand = brand;
-    if (status) query.status = status;
-    if (inStock === 'true') query.stockQuantity = { $gt: 0 };
-
-    let sort = { createdAt: -1 };
-    if (sortBy === 'price') sort = { price: 1 };
-    if (sortBy === 'name') sort = { name: 1 };
-    if (sortBy === 'stock') sort = { stockQuantity: -1 };
 
     const products = await ServiceProduct.find(query)
+      .populate('createdBy', 'name email')
+      .populate('vehicleSpecificProducts.serviceVehicleId')
+      .populate('vehicleSpecificProducts.providerId')
       .skip(skip)
       .limit(limit)
-      .sort(sort);
+      .sort({ createdAt: -1 });
 
     const total = await ServiceProduct.countDocuments(query);
 
@@ -81,7 +67,11 @@ const serviceProductController = {
       throw new ApiError(400, 'Invalid product ID');
     }
 
-    const product = await ServiceProduct.findById(id);
+    const product = await ServiceProduct.findById(id)
+      .populate('createdBy', 'name email')
+      .populate('vehicleSpecificProducts.serviceVehicleId')
+      .populate('vehicleSpecificProducts.providerId');
+
     if (!product) {
       throw new ApiError(404, 'Product not found');
     }
@@ -101,18 +91,15 @@ const serviceProductController = {
       throw new ApiError(404, 'Product not found');
     }
 
-    if (req.files && req.files.length > 0) {
-      const newImages = await Promise.all(req.files.map(file => 
-        fileHandler.saveFile(file, 'uploads/product-images')
-      ));
-      req.body.images = [...(product.images || []), ...newImages];
-    }
-
     const updatedProduct = await ServiceProduct.findByIdAndUpdate(
       id,
-      req.body,
+      {
+        name: req.body.name,
+        brand: req.body.brand,
+        vehicleSpecificProducts: req.body.vehicleSpecificProducts
+      },
       { new: true, runValidators: true }
-    );
+    ).populate('createdBy vehicleSpecificProducts.serviceVehicleId vehicleSpecificProducts.providerId');
 
     const response = new ResponseHandler(res);
     return response.success(updatedProduct);
@@ -129,9 +116,7 @@ const serviceProductController = {
       throw new ApiError(404, 'Product not found');
     }
 
-    // Soft delete
-    product.status = 'deleted';
-    await product.save();
+    await ServiceProduct.findByIdAndDelete(id);
 
     const response = new ResponseHandler(res);
     return response.success({ message: 'Product deleted successfully' });
@@ -172,19 +157,17 @@ const serviceProductController = {
     const { page, limit, skip } = paginationHelper.getPaginationParams(req);
 
     const searchQuery = {
-      status: 'active',
       $or: [
         { name: new RegExp(query, 'i') },
-        { description: new RegExp(query, 'i') },
-        { brand: new RegExp(query, 'i') },
-        { category: new RegExp(query, 'i') }
+        { brand: new RegExp(query, 'i') }
       ]
     };
 
     const products = await ServiceProduct.find(searchQuery)
+      .populate('createdBy vehicleSpecificProducts.serviceVehicleId vehicleSpecificProducts.providerId')
       .skip(skip)
       .limit(limit)
-      .sort({ name: 1 });
+      .sort({ createdAt: -1 });
 
     const total = await ServiceProduct.countDocuments(searchQuery);
 

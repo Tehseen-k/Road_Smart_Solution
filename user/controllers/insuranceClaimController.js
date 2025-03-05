@@ -1,12 +1,12 @@
 const InsuranceClaim = require('../models/InsuranceClaim');
 const InsuranceDoc = require('../models/InsuranceDoc');
 const UserCar = require('../models/UserCar');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const insuranceClaimController = {
   createClaim: catchAsync(async (req, res) => {

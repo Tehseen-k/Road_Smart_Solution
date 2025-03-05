@@ -1,18 +1,18 @@
 const ServiceCategory = require('../models/ServiceCategory');
 const ServiceSubcategory = require('../models/ServiceSubcategory');
 const ServiceType = require('../models/ServiceType');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
-const fileHandler = require('../utils/fileHandler');
+const ApiError = require('../..//utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
+const fileHandler = require('../../utils/fileHandler');
 
 const serviceCategoryController = {
   // Create new category
   createCategory: catchAsync(async (req, res) => {
     const existingCategory = await ServiceCategory.findOne({
-      name: req.body.name
+      categoryName: req.body.categoryName
     });
 
     if (existingCategory) {
@@ -20,7 +20,7 @@ const serviceCategoryController = {
     }
 
     const category = new ServiceCategory({
-      name: req.body.name,
+      categoryName: req.body.categoryName,
       description: req.body.description,
       displayOrder: req.body.displayOrder || 0
     });
@@ -54,7 +54,7 @@ const serviceCategoryController = {
       categories = await ServiceCategory.find(query)
         .skip(skip)
         .limit(limit)
-        .sort({ displayOrder: 1, name: 1 });
+        .sort({ displayOrder: 1, categoryName: 1 });
 
       // Get subcategories for each category
       const categoriesWithSubs = await Promise.all(categories.map(async (category) => {
@@ -72,7 +72,7 @@ const serviceCategoryController = {
       categories = await ServiceCategory.find(query)
         .skip(skip)
         .limit(limit)
-        .sort({ displayOrder: 1, name: 1 });
+        .sort({ displayOrder: 1, categoryName: 1 });
 
       total = await ServiceCategory.countDocuments(query);
     }
@@ -126,9 +126,9 @@ const serviceCategoryController = {
     }
 
     // Check name uniqueness if name is being updated
-    if (req.body.name && req.body.name !== category.name) {
+    if (req.body.categoryName && req.body.categoryName !== category.categoryName) {
       const existingCategory = await ServiceCategory.findOne({
-        name: req.body.name,
+        categoryName: req.body.categoryName,
         _id: { $ne: category._id }
       });
 
@@ -216,7 +216,7 @@ const serviceCategoryController = {
     ));
 
     const updatedCategories = await ServiceCategory.find()
-      .sort({ displayOrder: 1, name: 1 });
+      .sort({ displayOrder: 1, categoryName: 1 });
 
     const response = new ResponseHandler(res);
     return response.success(updatedCategories, 'Categories reordered successfully');
@@ -243,7 +243,7 @@ const serviceCategoryController = {
       },
       {
         $project: {
-          name: 1,
+          categoryName: 1,
           subcategoriesCount: { $size: '$subcategories' },
           serviceTypesCount: { $size: '$serviceTypes' },
           averagePrice: { $avg: '$serviceTypes.standardPrice' }
@@ -278,7 +278,7 @@ const serviceCategoryController = {
       },
       {
         $project: {
-          name: 1,
+          categoryName: 1,
           requestCount: { $size: '$requests' }
         }
       },

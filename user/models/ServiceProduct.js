@@ -9,8 +9,8 @@ const serviceProductSchema = new mongoose.Schema({
   },
   vehicleSpecificProducts: [{
     serviceVehicleId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'ServiceVehicle'
+      type: String,
+
     },
     quantity: Number,
     providerId: {

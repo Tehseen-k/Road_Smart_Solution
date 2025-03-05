@@ -185,7 +185,7 @@ router.delete('/car-for-sale/:id', carForSaleController.deleteListing);
  *       500:
  *         description: Internal server error
  */
-router.get('/car-for-sale/search', carForSaleController.searchListings);
+router.get('/car-for-sale/search', carForSaleController.getAllListings);
 
 /**
  * @swagger

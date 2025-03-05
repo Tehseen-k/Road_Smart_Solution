@@ -1,10 +1,10 @@
 const InsuranceEstimate = require('../models/InsuranceEstimate');
 const InsuranceDetail = require('../models/InsuranceDetail');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
-const ResponseHandler = require('../utils/responseHandler');
-const validationHelper = require('../utils/validationHelper');
-const paginationHelper = require('../utils/paginationHelper');
+const ApiError = require('../../utils/ApiError');
+const catchAsync = require('../../utils/catchAsync');
+const ResponseHandler = require('../../utils/responseHandler');
+const validationHelper = require('../../utils/validationHelper');
+const paginationHelper = require('../../utils/paginationHelper');
 
 const insuranceEstimateController = {
   createEstimate: catchAsync(async (req, res) => {

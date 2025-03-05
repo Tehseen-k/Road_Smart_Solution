@@ -373,16 +373,17 @@ const userController = {
       throw new ApiError(404, 'User not found');
     }
 
-    const verificationToken = crypto.randomBytes(6).toString('hex'); // 6-digit OTP
-    user.emailVerificationToken = verificationToken;
-    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    const emailVerificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+    const emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
+    user.emailVerificationToken=emailVerificationToken;
+    user.emailVerificationExpires=emailVerificationExpires;
     await user.save();
 
     try {
       const emailData = {
         email: user.email,
         name: user.username,
-        otp: verificationToken
+        otp: emailVerificationToken
       };
 
       await sendEmail('verification', emailData);
@@ -424,8 +425,7 @@ const userController = {
     if (!user) {
       throw new ApiError(404, 'User not found');
     }
-
-    const resetToken = crypto.randomBytes(6).toString('hex'); // 6-digit OTP
+    const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();

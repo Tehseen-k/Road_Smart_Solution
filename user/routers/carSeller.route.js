@@ -1,11 +1,50 @@
 const express = require('express');
 const router = express.Router();
 const carSellerController = require('../controllers/carSellerController');
+/**
+ * @swagger
+ * tags:
+ *   name: Car Seller Management
+ *   description: APIs for managing car sellers
+ */
 
 /**
  * @swagger
- * /car-sellers:
+ * components:
+ *   schemas:
+ *     CarSeller:
+ *       type: object
+ *       required:
+ *         - userId
+ *         - businessName
+ *       properties:
+ *         userId:
+ *           type: string
+ *           description: Reference to the User model
+ *         businessName:
+ *           type: string
+ *           description: Name of the car selling business
+ *         contactInfo:
+ *           type: string
+ *           description: Contact information for the seller
+ *         address:
+ *           type: string
+ *           description: Physical address of the business
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of when the record was created
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of when the record was last updated
+ */
+
+/**
+ * @swagger
+ * /user/car-sellers:
  *   post:
+ *     tags: [Car Seller Management]
  *     summary: Create a new car seller
  *     requestBody:
  *       required: true
@@ -13,36 +52,27 @@ const carSellerController = require('../controllers/carSellerController');
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - userId
+ *               - businessName
  *             properties:
- *               name:
+ *               userId:
  *                 type: string
- *               email:
- *                 type: string
- *               phone:
- *                 type: string
- *               address:
- *                 type: string
+ *                 description: ID of the associated user
  *               businessName:
  *                 type: string
- *               businessType:
+ *                 description: Name of the car selling business
+ *               contactInfo:
  *                 type: string
- *               licenseNumber:
+ *                 description: Contact information for the seller
+ *               address:
  *                 type: string
- *               taxId:
- *                 type: string
- *               description:
- *                 type: string
- *               operatingHours:
- *                 type: string
- *               specialties:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 description: Physical address of the business
  *     responses:
  *       201:
  *         description: Car seller created successfully
  *       400:
- *         description: Seller with this email already exists
+ *         description: Seller already exists for this user
  *       500:
  *         description: Internal server error
  */
@@ -50,29 +80,36 @@ router.post('/car-sellers', carSellerController.createSeller);
 
 /**
  * @swagger
- * /car-sellers:
+ * /user/car-sellers:
  *   get:
+ *     tags: [Car Seller Management]
  *     summary: Get all car sellers with optional filters
  *     parameters:
  *       - in: query
- *         name: businessType
+ *         name: businessName
  *         required: false
- *         description: Filter sellers by business type
+ *         description: Filter sellers by business name
  *         schema:
  *           type: string
- *       - in: query
- *         name: rating
- *         required: false
- *         description: Filter sellers by minimum rating
- *         schema:
- *           type: number
  *       - in: query
  *         name: sortBy
  *         required: false
  *         description: Sort sellers by field
  *         schema:
  *           type: string
- *           enum: [rating, name]
+ *           enum: [businessName, createdAt]
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Number of items per page
  *     responses:
  *       200:
  *         description: A list of car sellers
@@ -83,8 +120,9 @@ router.get('/car-sellers', carSellerController.getAllSellers);
 
 /**
  * @swagger
- * /car-sellers/{id}:
+ * /user/car-sellers/{id}:
  *   get:
+ *     tags: [Car Seller Management]
  *     summary: Get car seller by ID
  *     parameters:
  *       - in: path
@@ -105,8 +143,9 @@ router.get('/car-sellers/:id', carSellerController.getSellerById);
 
 /**
  * @swagger
- * /car-sellers/{id}:
+ * /user/car-sellers/{id}:
  *   put:
+ *     tags: [Car Seller Management]
  *     summary: Update car seller by ID
  *     parameters:
  *       - in: path
@@ -122,30 +161,15 @@ router.get('/car-sellers/:id', carSellerController.getSellerById);
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               phone:
- *                 type: string
- *               address:
- *                 type: string
  *               businessName:
  *                 type: string
- *               businessType:
+ *                 description: Name of the car selling business
+ *               contactInfo:
  *                 type: string
- *               licenseNumber:
+ *                 description: Contact information for the seller
+ *               address:
  *                 type: string
- *               taxId:
- *                 type: string
- *               description:
- *                 type: string
- *               operatingHours:
- *                 type: string
- *               specialties:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 description: Physical address of the business
  *     responses:
  *       200:
  *         description: Car seller updated successfully
@@ -160,8 +184,9 @@ router.put('/car-sellers/:id', carSellerController.updateSeller);
 
 /**
  * @swagger
- * /car-sellers/{id}:
+ * /user/car-sellers/{id}:
  *   delete:
+ *     tags: [Car Seller Management]
  *     summary: Delete car seller by ID
  *     parameters:
  *       - in: path
@@ -171,7 +196,7 @@ router.put('/car-sellers/:id', carSellerController.updateSeller);
  *         schema:
  *           type: string
  *     responses:
- *       200:
+ *       204:
  *         description: Car seller deleted successfully
  *       400:
  *         description: Invalid seller ID
@@ -184,47 +209,15 @@ router.delete('/car-sellers/:id', carSellerController.deleteSeller);
 
 /**
  * @swagger
- * /car-sellers/{id}/rating:
- *   patch:
- *     summary: Update car seller's rating
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: The car seller ID
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               rating:
- *                 type: number
- *     responses:
- *       200:
- *         description: Car seller's rating updated
- *       400:
- *         description: Invalid seller ID or rating
- *       404:
- *         description: Car seller not found
- *       500:
- *         description: Internal server error
- */
-router.patch('/car-sellers/:id/rating', carSellerController.updateSellerRating);
-
-/**
- * @swagger
- * /car-sellers/search:
+ * /user/car-sellers/search:
  *   get:
+ *     tags: [Car Seller Management]
  *     summary: Search for car sellers
  *     parameters:
  *       - in: query
  *         name: query
  *         required: true
- *         description: Search query string
+ *         description: Search query string (searches in businessName, contactInfo, and address)
  *         schema:
  *           type: string
  *       - in: query
@@ -248,3 +241,4 @@ router.patch('/car-sellers/:id/rating', carSellerController.updateSellerRating);
 router.get('/car-sellers/search', carSellerController.searchSellers);
 
 module.exports = router;
+
