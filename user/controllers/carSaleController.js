@@ -10,6 +10,13 @@ const fileHandler = require('../../utils/fileHandler');
 const carSaleController = {
   // Create new car listing
   createCarListing: catchAsync(async (req, res) => {
+    // Validate required fields
+    const requiredFields = ['sellerId', 'make', 'model', 'year', 'vin', 'price'];
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+    if (missingFields.length > 0) {
+      throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
+    }
+
     if (!validationHelper.isValidId(req.body.sellerId)) {
       throw new ApiError(400, 'Invalid seller ID');
     }
