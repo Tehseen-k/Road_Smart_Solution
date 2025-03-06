@@ -25,31 +25,39 @@ const userserviceQouteRoutes = require('./serviceQoute.route');
 const uservehicleSpecificPeoductRoutes = require('./vehicleSpecificPeoduct.route');
 const usercarForSaleRoutes = require('./carForSale.route');
 const userserviceSubCategoryRoutes = require('./serviceSubCategory.route');
+const authMiddleware = require('../middleware/auth');
+
 const router = express.Router();
-router.use('/user', userserviceSubCategoryRoutes);
-router.use('/user', userserviceTypeRoutes);
-router.use('/user', userserviceReminderRoutes);
-router.use('/user', userserviceConfirmationRoutes);
-router.use('/user', userserviceQouteRoutes);
-router.use('/user', uservehicleSpecificPeoductRoutes);
-router.use('/user', usercarForSaleRoutes);
-router.use('/user', authRoutes);
-router.use('/user-car', userCarRoutes);
-router.use('/car-part', userCarPartRoutes);
-router.use('/car-part-order', userCarPartOrderRoutes);
-router.use('/user', userServiceCategoryRoutes);
-router.use('/user', userServiceProductRoutes);
-router.use('/user', userestimateRoutes);
-router.use('/user', userCarSaleRoutes);
-router.use('/user', userCarSellerRoutes);
-router.use('/user', userInsuranceRoutes);
-router.use('/user', userInsuranceClaimRoutes);
-router.use('/user', userInsuranceDetailRoutes);
-router.use('/user', userInsuranceEstimateRoutes);
-router.use('/user', userrentalBookingRoutes);
-router.use('/user', userrentalCarRoutes);
-router.use('/user', userrentalProviderRoutes);
-router.use('/user', userroadLicenseRoutes);
-router.use('/user', userserviceProviderRoutes);
-router.use('/user', userserviceRequestRoutes);
+var userString = "/user";
+
+// Public routes (no authentication required)
+router.use(userString, authRoutes);
+
+// Protected routes (authentication required)
+router.use(userString, authMiddleware, userserviceSubCategoryRoutes);
+router.use(userString, authMiddleware, userserviceTypeRoutes);
+router.use(userString, authMiddleware, userserviceReminderRoutes);
+router.use(userString, authMiddleware, userserviceConfirmationRoutes);
+router.use(userString, authMiddleware, userserviceQouteRoutes);
+router.use(userString, authMiddleware, uservehicleSpecificPeoductRoutes);
+router.use(userString, authMiddleware, usercarForSaleRoutes);
+router.use('/user-car', authMiddleware, userCarRoutes);
+router.use('/car-part', authMiddleware, userCarPartRoutes);
+router.use('/car-part-order', authMiddleware, userCarPartOrderRoutes);
+router.use(userString, authMiddleware, userServiceCategoryRoutes);
+router.use(userString, authMiddleware, userServiceProductRoutes);
+router.use(userString, authMiddleware, userestimateRoutes);
+router.use(userString, authMiddleware, userCarSaleRoutes);
+router.use(userString, authMiddleware, userCarSellerRoutes);
+router.use(userString, authMiddleware, userInsuranceRoutes);
+router.use(userString, authMiddleware, userInsuranceClaimRoutes);
+router.use(userString, authMiddleware, userInsuranceDetailRoutes);
+router.use(userString, authMiddleware, userInsuranceEstimateRoutes);
+router.use(userString, authMiddleware, userrentalBookingRoutes);
+router.use(userString, authMiddleware, userrentalCarRoutes);
+router.use(userString, authMiddleware, userrentalProviderRoutes);
+router.use(userString, authMiddleware, userroadLicenseRoutes);
+router.use(userString, authMiddleware, userserviceProviderRoutes);
+router.use(userString, authMiddleware, userserviceRequestRoutes);
+
 module.exports = router;

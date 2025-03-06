@@ -25,13 +25,13 @@ const carPartController = {
       carPart.images = images;
     }
 
-    if (req.body.specifications) {
-      try {
-        carPart.specifications = JSON.parse(req.body.specifications);
-      } catch (error) {
-        throw new ApiError(400, 'Invalid specifications format');
-      }
-    }
+    // if (req.body.specifications) {
+    //   try {
+        // carPart.specifications = JSON.parse(req.body.specifications);
+    //   } catch (error) {
+    //     throw new ApiError(400, 'Invalid specifications format');
+    //   }
+    // }
 
     await carPart.save();
 

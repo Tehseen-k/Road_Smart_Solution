@@ -25,6 +25,53 @@ const options = {
             scheme: 'bearer',
             bearerFormat: 'JWT'
           }
+        },
+        schemas: {
+          Token: {
+            type: 'object',
+            properties: {
+              token: {
+                type: 'string',
+                description: 'JWT access token'
+              },
+              type: {
+                type: 'string',
+                example: 'Bearer'
+              }
+            }
+          }
+        }
+      },
+      security: [
+        {
+          bearerAuth: []
+        }
+      ],
+      paths: {
+        '/user/login': {
+          post: {
+            security: [] // No security for login endpoint
+          }
+        },
+        '/user/register': {
+          post: {
+            security: [] // No security for register endpoint
+          }
+        },
+        '/user/forgot-password': {
+          post: {
+            security: [] // No security for forgot password endpoint
+          }
+        },
+        '/user/reset-password/{token}': {
+          post: {
+            security: [] // No security for reset password endpoint
+          }
+        },
+        '/user/verify-email/{token}': {
+          get: {
+            security: [] // No security for email verification endpoint
+          }
         }
       }
     },
