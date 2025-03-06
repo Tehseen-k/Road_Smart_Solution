@@ -1,44 +1,75 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CarSale:
+ *       type: object
+ *       required:
+ *         - sellerId
+ *         - make
+ *         - model
+ *         - year
+ *         - vin
+ *         - price
+ *       properties:
+ *         sellerId:
+ *           type: string
+ *           description: ID of the car seller
+ *         make:
+ *           type: string
+ *           description: Car manufacturer
+ *         model:
+ *           type: string
+ *           description: Car model
+ *         year:
+ *           type: integer
+ *           description: Manufacturing year
+ *         vin:
+ *           type: string
+ *           description: Vehicle Identification Number
+ *         price:
+ *           type: number
+ *           description: Car price
+ *         mileage:
+ *           type: number
+ *           description: Car mileage
+ *         description:
+ *           type: string
+ *           description: Car description
+ *         status:
+ *           type: string
+ *           enum: [available, sold]
+ *           default: available
+ *           description: Car sale status
+ * 
+ * tags:
+ *   - name: Car Sales
+ *     description: Car sales management API
+ */
+
 const express = require('express');
 const router = express.Router();
 const carSaleController = require('../controllers/carSaleController');
 
 /**
  * @swagger
- * /car-sales:
+ * /user/car-sales:
  *   post:
+ *     tags: [Car Sales]
  *     summary: Create a new car listing
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               sellerId:
- *                 type: string
- *               vin:
- *                 type: string
- *               make:
- *                 type: string
- *               model:
- *                 type: string
- *               year:
- *                 type: integer
- *               mileage:
- *                 type: integer
- *               price:
- *                 type: number
- *                 format: float
- *               description:
- *                 type: string
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: uri
+ *             $ref: '#/components/schemas/CarSale'
  *     responses:
  *       201:
  *         description: Car listing created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CarSale'
  *       400:
  *         description: Invalid seller ID or car VIN already exists
  *       500:
@@ -48,8 +79,9 @@ router.post('/car-sales', carSaleController.createCarListing);
 
 /**
  * @swagger
- * /car-sales:
+ * /user/car-sales:
  *   get:
+ *     tags: [Car Sales]
  *     summary: Get all car listings with filters
  *     parameters:
  *       - in: query
@@ -82,6 +114,24 @@ router.post('/car-sales', carSaleController.createCarListing);
  *     responses:
  *       200:
  *         description: A list of car listings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 cars:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CarSale'
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     pages:
+ *                       type: integer
  *       500:
  *         description: Internal server error
  */
@@ -89,8 +139,9 @@ router.get('/car-sales', carSaleController.getAllListings);
 
 /**
  * @swagger
- * /car-sales/{id}:
+ * /user/car-sales/{id}:
  *   get:
+ *     tags: [Car Sales]
  *     summary: Get car listing by ID
  *     parameters:
  *       - in: path
@@ -102,6 +153,10 @@ router.get('/car-sales', carSaleController.getAllListings);
  *     responses:
  *       200:
  *         description: Car listing found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CarSale'
  *       400:
  *         description: Invalid listing ID
  *       404:
@@ -111,8 +166,9 @@ router.get('/car-sales/:id', carSaleController.getListingById);
 
 /**
  * @swagger
- * /car-sales/{id}:
+ * /user/car-sales/{id}:
  *   put:
+ *     tags: [Car Sales]
  *     summary: Update car listing by ID
  *     parameters:
  *       - in: path
@@ -126,24 +182,14 @@ router.get('/car-sales/:id', carSaleController.getListingById);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               make:
- *                 type: string
- *               model:
- *                 type: string
- *               year:
- *                 type: integer
- *               mileage:
- *                 type: integer
- *               price:
- *                 type: number
- *                 format: float
- *               description:
- *                 type: string
+ *             $ref: '#/components/schemas/CarSale'
  *     responses:
  *       200:
  *         description: Car listing updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CarSale'
  *       400:
  *         description: Invalid listing ID
  *       404:
@@ -155,8 +201,9 @@ router.put('/car-sales/:id', carSaleController.updateListing);
 
 /**
  * @swagger
- * /car-sales/{id}:
+ * /user/car-sales/{id}:
  *   delete:
+ *     tags: [Car Sales]
  *     summary: Delete car listing by ID
  *     parameters:
  *       - in: path
@@ -166,7 +213,7 @@ router.put('/car-sales/:id', carSaleController.updateListing);
  *         schema:
  *           type: string
  *     responses:
- *       200:
+ *       204:
  *         description: Car listing deleted successfully
  *       400:
  *         description: Invalid listing ID
@@ -179,8 +226,9 @@ router.delete('/car-sales/:id', carSaleController.deleteListing);
 
 /**
  * @swagger
- * /car-sales/search:
+ * /user/car-sales/search:
  *   get:
+ *     tags: [Car Sales]
  *     summary: Search for car listings based on query
  *     parameters:
  *       - in: query
@@ -192,6 +240,24 @@ router.delete('/car-sales/:id', carSaleController.deleteListing);
  *     responses:
  *       200:
  *         description: A list of matching car listings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 cars:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CarSale'
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     pages:
+ *                       type: integer
  *       500:
  *         description: Internal server error
  */
@@ -199,8 +265,9 @@ router.get('/car-sales/search', carSaleController.searchListings);
 
 /**
  * @swagger
- * /car-sales/seller/{sellerId}:
+ * /user/car-sales/seller/{sellerId}:
  *   get:
+ *     tags: [Car Sales]
  *     summary: Get car listings by seller ID
  *     parameters:
  *       - in: path
@@ -212,6 +279,24 @@ router.get('/car-sales/search', carSaleController.searchListings);
  *     responses:
  *       200:
  *         description: A list of car listings for the seller
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 cars:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CarSale'
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     pages:
+ *                       type: integer
  *       400:
  *         description: Invalid seller ID
  *       500:
@@ -221,12 +306,44 @@ router.get('/car-sales/seller/:sellerId', carSaleController.getSellerListings);
 
 /**
  * @swagger
- * /car-sales/stats:
+ * /user/car-sales/stats:
  *   get:
+ *     tags: [Car Sales]
  *     summary: Get car listing statistics
  *     responses:
  *       200:
  *         description: Car listing statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusStats:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       count:
+ *                         type: integer
+ *                       avgPrice:
+ *                         type: number
+ *                       minPrice:
+ *                         type: number
+ *                       maxPrice:
+ *                         type: number
+ *                 makeStats:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       count:
+ *                         type: integer
+ *                       avgPrice:
+ *                         type: number
  *       500:
  *         description: Internal server error
  */
