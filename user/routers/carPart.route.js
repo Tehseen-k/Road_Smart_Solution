@@ -62,7 +62,7 @@ router.post('/', upload.array('images'), carPartController.createCarPart);
 
 /**
  * @swagger
- * /car-part/car-parts:
+ * /car-part:
  *   get:
  *     summary: Get all car parts with filters
  *     tags: [Car Parts]
@@ -112,7 +112,7 @@ router.get('/', carPartController.getAllParts);
 
 /**
  * @swagger
- * /car-part/car-parts/{id}:
+ * /car-part/{id}:
  *   get:
  *     summary: Get a car part by ID
  *     tags: [Car Parts]
@@ -133,7 +133,7 @@ router.get('/:id', carPartController.getPartById);
 
 /**
  * @swagger
- * /car-part/car-parts/{id}:
+ * /car-part/{id}:
  *   patch:
  *     summary: Update a car part
  *     tags: [Car Parts]
@@ -212,7 +212,7 @@ router.delete('/:id', carPartController.deletePart);
 
 /**
  * @swagger
- * /car-part/car-parts/search:
+ * /car-part/search:
  *   get:
  *     summary: Search car parts
  *     tags: [Car Parts]
@@ -243,7 +243,7 @@ router.get('/search', carPartController.searchParts);
 
 /**
  * @swagger
- * /car-part/car-parts/category/{category}:
+ * /car-part/category/{category}:
  *   get:
  *     summary: Get car parts by category
  *     tags: [Car Parts]
